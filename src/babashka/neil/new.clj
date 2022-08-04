@@ -99,8 +99,6 @@
       (throw (invalid-lib-opts-error lib-opts))
       (template-deps-fn lib-sym lib-opts))))
 
-(def bb? (System/getProperty "babashka.version"))
-
 (def create-opts-deny-list
   [:deps-file :dry-run :git/sha :git/url :latest-sha :local/root :sha])
 
@@ -120,8 +118,13 @@
               :scratch (:name cli-opts)})
            (apply dissoc cli-opts create-opts-deny-list))))
 
+(def bb? (System/getProperty "babashka.version"))
+
 (defn- deps-new-plan
   "Returns a plan for calling org.corfield.new/create.
+
+  :set-classpath - Set to true if we need to set java.class.path first
+                   (Babashka only)
 
   :template-deps - These deps will be added with babashka.deps/add-deps before
                    calling the create function.
@@ -132,8 +135,10 @@
   (let [create-opts (cli-opts->create-opts cli-opts)
         tpl-deps (when (and bb? (not (built-in-template? (:template create-opts))))
                    (template-deps (:template create-opts) cli-opts))]
-    (merge (when tpl-deps {:template-deps tpl-deps})
-           {:create-opts create-opts})))
+    (merge
+      (when bb? {:set-classpath true})
+      (when tpl-deps {:template-deps tpl-deps})
+      {:create-opts create-opts})))
 
 (defn- deps-new-create [create-opts]
   ((requiring-resolve 'org.corfield.new/create) create-opts))
@@ -204,11 +209,11 @@ options can be used to control the add-deps behavior:
     (do
       (require 'org.corfield.new)
       (let [plan (deps-new-plan opts)
-            {:keys [template-deps create-opts]} plan]
+            {:keys [template-deps create-opts set-classpath]} plan]
         (if (:dry-run opts)
           (do (prn plan) nil)
           (do
             (when template-deps (deps-new-add-template-deps template-deps))
-            (when bb? (deps-new-set-classpath))
+            (when set-classpath (deps-new-set-classpath))
             (deps-new-create create-opts)
             nil))))))
