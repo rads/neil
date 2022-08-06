@@ -27,7 +27,7 @@
                                                        :draft false
                                                        :tag (str "v" (version))}))}
          tag {:doc "Create and push tag"
-              :task (do (shell "git tag" (str "v" (utils/format-version)))
+              :task (do (shell "git tag" (str "v" (version)))
                         (shell "git push --atomic" "origin" "main" (str "v" (version))))}
          update-readme {:task (let [help (:out (shell {:out :string} "./neil"))]
                                (without-escaping
