@@ -1,9 +1,0 @@
-#!/usr/bin/env bb
-;; -*- mode: clojure -*-
-
-(require '[babashka.fs :as fs])
-
-(load-file (str (fs/parent *file*) "/neil"))
-(deps/add-deps '{:deps {org.babashka/neil {:local/root "."}}})
-
-((requiring-resolve 'babashka.neil/-main))

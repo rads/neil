@@ -3,7 +3,31 @@
  :tasks {:requires ([clojure.string :as str]
                     [selmer.parser :as p]
                     [selmer.util :refer [without-escaping]])
-         update-readme {:task (let [help (:out (shell {:out :string} "./neil-local"))]
+         package-jar {:doc "Prepare jar for packages"
+                      :task (do
+                              (println "Producing uberjar")
+                              (shell "bb --config .build/uberjar.edn --deps-root .
+                                        uberjar neil.jar -m babashka.neil"))}
+         upload-release {:doc "Upload jar to release"
+                         :depends [package-jar]
+                         :requires ([borkdude.gh-release-artifact :as ghr])
+                         :task (do
+                                 (println "Uploading neil.jar" (str "v" (utils/format-version)))
+                                 (ghr/overwrite-asset {:org "rads"
+                                                       :repo "neil"
+                                                       :file "neil"
+                                                       :draft false
+                                                       :tag (str "v" (utils/format-version))})
+                                 (println "Uploading neil" (str "v" (utils/format-version)))
+                                 (ghr/overwrite-asset {:org "rads"
+                                                       :repo "neil"
+                                                       :file "neil.jar"
+                                                       :draft false
+                                                       :tag (str "v" (utils/format-version))}))}
+         tag {:doc "Create and push tag"
+              :task (do (shell "git tag" (str "v" (utils/format-version)))
+                        (shell "git push --atomic" "origin" "main" (str "v" (utils/format-version))))}
+         update-readme {:task (let [help (:out (shell {:out :string} "./neil"))]
                                (without-escaping
                                 (->> (p/render (slurp "README.template.md")
                                                {:help (str/trim help)
