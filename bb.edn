@@ -1,6 +1,8 @@
-{:paths ["src"]
- :deps {org.babashka/neil {:local/root "."}}
- :tasks {:requires ([clojure.string :as str]
+{:paths ["src" ".build"]
+ :deps {org.babashka/neil {:local/root "."}
+        io.github.borkdude/gh-release-artifact {:git/sha "cf082df46a648178d1904e9cbcb787d8136a35c6"}}
+ :tasks {:init (do (defn version [] (str/trim (slurp "version.txt"))))
+         :requires ([clojure.string :as str]
                     [selmer.parser :as p]
                     [selmer.util :refer [without-escaping]])
          package-jar {:doc "Prepare jar for packages"
@@ -12,21 +14,21 @@
                          :depends [package-jar]
                          :requires ([borkdude.gh-release-artifact :as ghr])
                          :task (do
-                                 (println "Uploading neil.jar" (str "v" (utils/format-version)))
+                                 (println "Uploading neil.jar" (str "v" (version)))
                                  (ghr/overwrite-asset {:org "rads"
                                                        :repo "neil"
                                                        :file "neil"
                                                        :draft false
-                                                       :tag (str "v" (utils/format-version))})
-                                 (println "Uploading neil" (str "v" (utils/format-version)))
+                                                       :tag (str "v" (version))})
+                                 (println "Uploading neil" (str "v" (version)))
                                  (ghr/overwrite-asset {:org "rads"
                                                        :repo "neil"
                                                        :file "neil.jar"
                                                        :draft false
-                                                       :tag (str "v" (utils/format-version))}))}
+                                                       :tag (str "v" (version))}))}
          tag {:doc "Create and push tag"
               :task (do (shell "git tag" (str "v" (utils/format-version)))
-                        (shell "git push --atomic" "origin" "main" (str "v" (utils/format-version))))}
+                        (shell "git push --atomic" "origin" "main" (str "v" (version))))}
          update-readme {:task (let [help (:out (shell {:out :string} "./neil"))]
                                (without-escaping
                                 (->> (p/render (slurp "README.template.md")
