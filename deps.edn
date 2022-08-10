@@ -14,4 +14,4 @@
                          com.taoensso/timbre {:mvn/version "5.2.1"}}
             :main-opts ["-m" "cognitect.test-runner"]
             :exec-fn cognitect.test-runner.api/test}
-           :neil {:project {:version {:major 0, :minor 0, :patch 2}}}}}
+           :neil {:project {:version {:major 0, :minor 0, :patch 3}}}}}
