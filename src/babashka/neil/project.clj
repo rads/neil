@@ -9,6 +9,11 @@
     (fs/file dir deps-file)
     deps-file))
 
+(defn read-deps-edn [{:keys [dir deps-file]}]
+  (some-> (resolve-deps-file dir deps-file)
+          slurp
+          edn/read-string))
+
 (defn ensure-neil-project [{:keys [dir deps-file]}]
   (let [deps-file (resolve-deps-file dir deps-file)
         deps-edn (slurp deps-file)
