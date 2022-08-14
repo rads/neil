@@ -6,12 +6,17 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      # First ensure we've got babashka installed
-      - run: curl -sLO https://raw.githubusercontent.com/babashka/babashka/master/install
-      - run: chmod +x ./install
-      - run: ./install
-      # Then run the tests
+
+      - name: Install clojure tools
+        uses: DeLaGuardo/setup-clojure@9.4
+        with:
+          bb: latest
+          clj-kondo: latest
+
+      - run: clj-kondo --lint .
+
       - run: bb run tests
+
       - name: Run Emacs tests for neil.el
         uses: purcell/setup-emacs@master
         with:
