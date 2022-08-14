@@ -6,6 +6,7 @@
    [babashka.tasks :as tasks]
    [clojure.edn :as edn]
    [clojure.string :as str]
+   [clojure.set :as set]
    [clojure.test :as t :refer [deftest is testing]]))
 
 (defn test-file [name]
