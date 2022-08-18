@@ -1,7 +1,6 @@
 {:paths ["src" "dev" "test"]
  :pods {org.babashka/fswatcher {:version "0.0.3"}}
- :deps {local/deps {:local/root "."}
-        borkdude/rewrite-edn {:mvn/version "0.2.0"}}
+ :deps {borkdude/rewrite-edn {:mvn/version "0.2.0"}}
  :tasks {:requires ([babashka.fs :as fs]
                     [clojure.string :as str]
                     [selmer.parser :as p]
